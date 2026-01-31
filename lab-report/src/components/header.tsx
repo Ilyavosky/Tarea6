@@ -1,13 +1,12 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography } from '@mui/material';
 
 const Header = () => {
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6">Dashboard</Typography>
-      </Toolbar>
-    </AppBar>
+    <header className="bg-blue-600 text-white shadow-md">
+      <div className="px-6 py-4">
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+      </div>
+    </header>
   );
 };
 
