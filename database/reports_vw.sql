@@ -26,7 +26,6 @@ ORDER BY total_vendido DESC
 -- Métricas Base: Suma de cantidades (total_vendido), suma de subtotales (ingresos_total)
 -- Campos Calculados: Precio promedio de venta por unidad (precio_promedio)
 -- Filtros/Condiciones: HAVING para excluir categorías sin ventas
-
 CREATE VIEW mas_vendidos_por_categoria AS
 SELECT
     c.id, 
@@ -41,3 +40,28 @@ JOIN orden_detalles od ON od.producto_id = p.id
 GROUP BY c.id, c.nombre, c.descripcion
 HAVING SUM(od.cantidad) >= 1
 ORDER BY total_vendido DESC;
+
+-- VIEW 3: Segmentación de clientes por gasto
+-- Grain: Una fila representa un usuario que ha realizado al menos una orden
+-- Métricas Base: COUNT de órdenes, SUM de totales
+-- Campos Calculados: Gasto promedio por orden, segmentación con CASE
+-- Filtros/Condiciones: HAVING para usuarios con al menos 1 orden
+
+CREATE VIEW clientes_segmentacion AS
+SELECT
+    u.id,
+    u.nombre,
+    u.email,
+    COUNT(DISTINCT o.id) AS ordenes_totales,
+    SUM(o.total) AS gasto_total,
+    SUM(o.total) / NULLIF(COUNT(DISTINCT o.id), 0) AS gasto_promedio,
+    CASE 
+        WHEN SUM(o.total) >= 1000 THEN 'Premium'
+        WHEN SUM(o.total) >= 500 THEN 'Regular'
+        ELSE 'Básico'
+    END AS segmento_cliente
+FROM usuarios u
+JOIN ordenes o ON o.usuario_id = u.id
+GROUP BY u.id, u.nombre, u.email
+HAVING COUNT(DISTINCT o.id) >= 1
+ORDER BY gasto_total DESC;
