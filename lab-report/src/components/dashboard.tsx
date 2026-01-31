@@ -33,8 +33,8 @@ const Dashboard = () => {
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">Reportes Disponibles</h2>
-        <p className="text-gray-600">Selecciona un reporte para acceder a la View</p>
+        <h2 className="text-3xl font-bold text-shadow-navy mb-2">Reportes Disponibles</h2>
+        <p className="text-armor-grey">Selecciona un reporte para acceder a la View</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -42,18 +42,18 @@ const Dashboard = () => {
           <Link
             key={report.id}
             href={`/reports/${report.id}`}
-            className="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+            className="flex flex-col bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-armor-grey"
           >
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <div className="p-6 flex-1">
+              <h3 className="text-xl font-semibold text-shadow-navy mb-2">
                 {report.title}
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-armor-grey text-sm">
                 {report.description}
               </p>
             </div>
-            <div className="bg-blue-50 px-6 py-3">
-              <span className="text-blue-600 text-sm font-medium">
+            <div className="px-6 py-3" style={{ backgroundColor: '#3C78A61A' }}>
+              <span className="text-salamence-blue text-sm font-medium">
                 Acceder a la view
               </span>
             </div>

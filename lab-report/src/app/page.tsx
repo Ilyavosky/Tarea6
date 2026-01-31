@@ -5,9 +5,9 @@ import Dashboard from '../components/dashboard';
 
 const Home = () => {
   return (
-    <div style={{ display: 'flex' }}>
+    <div className="flex">
       <Sidebar />
-      <div style={{ flexGrow: 1 }}>
+      <div className="flex-1 flex flex-col">
         <Header />
         <Dashboard />
       </div>
