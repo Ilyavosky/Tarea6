@@ -65,3 +65,35 @@ JOIN ordenes o ON o.usuario_id = u.id
 GROUP BY u.id, u.nombre, u.email
 HAVING COUNT(DISTINCT o.id) >= 1
 ORDER BY gasto_total DESC;
+
+-- VIEW 4: Análisis de órdenes con totales globales
+-- Grain: Una fila representa una orden individual
+-- Métricas Base: COUNT de items, SUM de subtotales
+-- Campos Calculados: Porcentaje de participación respecto al total de ventas
+-- Usa: CTE para calcular totales globales
+
+CREATE VIEW ordenes_analisis AS
+WITH totales_sistema AS (
+    SELECT 
+        SUM(total) AS ventas_totales
+    FROM ordenes
+)
+SELECT
+    o.id AS orden_id,
+    u.nombre AS cliente_nombre,
+    o.status,
+    COUNT(od.id) AS items_count,
+    o.total AS total_orden,
+    ROUND((o.total / NULLIF(ts.ventas_totales, 0)) * 100, 2) AS porcentaje_ventas,
+    CASE 
+        WHEN o.status = 'entregado' THEN 'Completada'
+        WHEN o.status IN ('pagado', 'enviado') THEN 'En proceso'
+        WHEN o.status = 'pendiente' THEN 'Pendiente'
+        ELSE 'Cancelada'
+    END AS estado_legible
+FROM ordenes o
+JOIN usuarios u ON u.id = o.usuario_id
+LEFT JOIN orden_detalles od ON od.orden_id = o.id
+CROSS JOIN totales_sistema ts
+GROUP BY o.id, u.nombre, o.status, o.total, ts.ventas_totales
+ORDER BY o.total DESC;
