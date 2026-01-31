@@ -1,22 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  --background: #3C78A6;
-  --foreground: #CD454E;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-  --background: #3C78A6;
-  --foreground: #CD454E;
-  }
-}
-
-body {
-  margin: 0;
-}@import "tailwindcss";
-
-:root {
   --salamence-red: #CD454E;
   --salamence-blue: #3C78A6;
   --armor-grey: #9AA4AE;
