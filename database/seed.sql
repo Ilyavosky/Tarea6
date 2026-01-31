@@ -1,8 +1,9 @@
 -- ============================================
 -- SEED.SQL - Datos Iniciales
 -- ============================================
--- Equipo: [Nombre del equipo]
--- Fecha: [Fecha]
+-- Alumno: Ilya Cortés Ruiz
+-- Matricula: 243710
+-- Fecha: 30/01/2026
 -- ============================================
 -- ORDEN DE INSERCIÓN:
 -- 1. Catálogos (sin dependencias)

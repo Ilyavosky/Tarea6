@@ -1,13 +1,13 @@
 -- ============================================
 -- SCHEMA.SQL - Definición de Estructura
 -- ============================================
--- Equipo: [Nombre del equipo]
--- Fecha: [Fecha]
--- Dominio: [Describir el dominio modelado]
+-- Alumno: Ilya Cortés Ruiz
+-- Matricula: 243710
+-- Fecha: 30/01/2026
+-- Dominio: Schema de base de datos para una tienda en linea
 -- ============================================
 
--- Limpiar tablas si existen (útil para desarrollo)
--- CUIDADO: Esto borra todos los datos
+
 DROP TABLE IF EXISTS tabla_relacion CASCADE;
 DROP TABLE IF EXISTS tabla_hija CASCADE;
 DROP TABLE IF EXISTS tabla_padre CASCADE;
