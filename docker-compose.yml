@@ -19,7 +19,30 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    networks:
+      - lab-network
+
+  nextjs:
+    build:
+      context: ./lab-report
+      dockerfile: Dockerfile
+    container_name: lab-nextjs
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://app_user:app_secure_password_2026@postgres:5432/lab_db
+      - NODE_ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lab-network
 
 volumes:
   postgres_data:
     driver: local
+
+networks:
+  lab-network:
+    driver: bridge
