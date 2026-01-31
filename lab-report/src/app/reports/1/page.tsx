@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { getTopProducts } from '@/lib/actions/reports';
 
 interface Product {
@@ -9,20 +12,47 @@ interface Product {
   precio_promedio: string;
 }
 
-export default async function Report1() {
-  const result = await getTopProducts();
+export default function Report1() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  if (!result.success) {
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const result = await getTopProducts();
+      
+      if (result.success) {
+        setProducts(result.data as Product[]);
+        setError('');
+      } else {
+        setError(result.error || 'Error desconocido');
+      }
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
     return (
-      <div className="p-8">
-        <div className="bg-salamence-red text-white p-4 rounded">
-          Error: {result.error}
+      <div className="p-8 bg-gray-50 min-h-screen">
+        <div className="text-center py-12">
+          <p className="text-armor-grey">Cargando...</p>
         </div>
       </div>
     );
   }
 
-  const products = result.data as Product[];
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="bg-salamence-red text-white p-4 rounded">
+          Error: {error}
+        </div>
+      </div>
+    );
+  }
+
   const totalVentas = products.reduce((sum, p) => sum + parseFloat(p.ingresos_total), 0);
 
   return (

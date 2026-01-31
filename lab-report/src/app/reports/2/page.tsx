@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { getTopCategories } from '@/lib/actions/reports';
 
 interface Category {
@@ -9,20 +12,47 @@ interface Category {
   precio_promedio: string;
 }
 
-export default async function Report2() {
-  const result = await getTopCategories();
+export default function Report2() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  if (!result.success) {
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const result = await getTopCategories();
+      
+      if (result.success) {
+        setCategories(result.data as Category[]);
+        setError('');
+      } else {
+        setError(result.error || 'Error desconocido');
+      }
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
     return (
-      <div className="p-8">
-        <div className="bg-salamence-red text-white p-4 rounded">
-          Error: {result.error}
+      <div className="p-8 bg-gray-50 min-h-screen">
+        <div className="text-center py-12">
+          <p className="text-armor-grey">Cargando...</p>
         </div>
       </div>
     );
   }
 
-  const categories = result.data as Category[];
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="bg-salamence-red text-white p-4 rounded">
+          Error: {error}
+        </div>
+      </div>
+    );
+  }
+
   const totalVentas = categories.reduce((sum, c) => sum + parseFloat(c.ingresos_total), 0);
 
   return (
