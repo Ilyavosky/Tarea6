@@ -168,6 +168,112 @@ Todas las consultas usan placeholders ($1, $2) en lugar de concatenar strings, p
 
 - **Estados de carga en cliente**: Los mensajes "Cargando..." se manejan con useState en React.
 
+## Performance Evidence:
+
+- Evidencia número 1
+
+```sql
+DROP INDEX IF EXISTS idx_orden_detalles_producto_id;
+
+EXPLAIN (ANALYZE, BUFFERS, VERBOSE)
+SELECT p.nombre, SUM(od.cantidad) AS total
+FROM productos p
+JOIN orden_detalles od ON od.producto_id = p.id
+GROUP BY p.nombre;
+
+CREATE INDEX idx_orden_detalles_producto_id ON orden_detalles(producto_id);
+
+EXPLAIN (ANALYZE, BUFFERS, VERBOSE)
+SELECT p.nombre, SUM(od.cantidad) AS total
+FROM productos p
+JOIN orden_detalles od ON od.producto_id = p.id
+GROUP BY p.nombre;
+```
+
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/21598fae-86eb-4d9b-86a3-2ba4dc82e50b" />
+
+- ¿Qué realiza la query?
+- Este EXPLAIN ANALYZE elimina el indice idx_orden_detalles_producto_id temporalmente y ejecuta el EXPLAIN sin el mismo, esto con el objetivo de ver el tiempo de busqueda puro haciendo un seq scan revisando todas la tabla fila por fila para ver los matches del JOIN.
+- Posteriormente recrea el indice y lo prueba nuevamente, saltando así a las filas que coinciden usando el índice para mejorar la rápidez de la query.
+
+- Evidencia número 2
+
+```sql
+DROP INDEX IF EXISTS idx_orden_detalles_orden_id;
+
+EXPLAIN (ANALYZE, BUFFERS, VERBOSE)
+SELECT o.id, COUNT(od.id) AS items_count
+FROM ordenes o
+LEFT JOIN orden_detalles od ON od.orden_id = o.id
+GROUP BY o.id;
+
+CREATE INDEX idx_orden_detalles_orden_id ON orden_detalles(orden_id);
+
+EXPLAIN (ANALYZE, BUFFERS, VERBOSE)
+SELECT o.id, COUNT(od.id) AS items_count
+FROM ordenes o
+LEFT JOIN orden_detalles od ON od.orden_id = o.id
+GROUP BY o.id;
+```
+
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/0761c762-d246-472d-994c-d8d2ff881b82" />
+
+- ¿Qué realiza la query?
+- Este EXPLAIN ANALYZE elimina el indice idx_orden_detalles_orden_id temporalmente y ejecuta el EXPLAIN sin el mismo, esto con el objetivo de ver el tiempo de busqueda puro de la tabla orden_detalles buscando, valga la redundancia, sus detalles.
+- Posteriormente recrea el indice y lo prueba nuevamente, saltando así a las filas y encontrando instantáneamente todos los detalles de cada orden usando el índice.
+
+## Threat Model: Seguridad Implementada
+
+### 1. Prevención de SQL Injection
+
+- Todas las queries usan **parámetros de posición** (`$1`, `$2`) en lugar de concatenación de strings.
+- Ejemplo en `reports.ts`: `pool.query(query, [validated.limit, offset])`
+
+### 2. Validación de Input con Zod
+
+- Parámetros fuera de rango o valores inesperados podrían causar errores o comportamiento no deseado.
+
+- Filtros: `segmento` solo acepta `['Premium', 'Regular', 'Básico', 'Todos']` 
+- Limites de paginación: `page` mínimo 1, `limit` entre 1-50 para paginación, 1-100 para filtros.
+- La validación ocurre en Server Actions antes de construir las queries.
+- Código en `schemas.ts`: `z.enum(['Premium', 'Regular', 'Básico', 'Todos'])` garantiza que no se puede pasar texto.
+
+### 3. Permisos Mínimos (Principio de Least Privilege)
+
+- Si la aplicación es comprometida, el atacante podría leer/modificar/eliminar datos sensibles.
+
+- La app se conecta con usuario `app_user`, NO con el superusuario `postgres`
+- `app_user` tiene solo permiso de `SELECT` en las 5 views (`mas_vendidos`, `mas_vendidos_por_categoria`, `clientes_segmentacion`, `ordenes_analisis`, `productos_ranking`)
+- No puede: leer tablas base (`usuarios`, `productos`, `ordenes`), hacer INSERT/UPDATE/DELETE, crear objetos en la BD
+- Código en `05_roles.sql`: `GRANT SELECT ON [view_name] TO app_user` + `REVOKE CREATE ON SCHEMA public FROM app_user`
+
+### 4. Credenciales Protegidas
+
+- Exposición de credenciales de base de datos en el código o en el navegador del cliente.
+
+- `DATABASE_URL` solo existe en **variables de entorno del servidor** (`.env` excluido en `.gitignore`)
+- El cliente (navegador) **nunca** recibe credenciales - todas las queries se ejecutan en Server Actions
+- `.env.example` incluido en el repo contiene solo placeholders, no valores reales
+- Docker Compose usa `${POSTGRES_PASSWORD}` desde variables de entorno, no hardcodeado en el YAML
+
+### 5. Server-Side Execution
+
+- El cliente podría modificar queries o acceder directamente a la base de datos.
+
+- Todas las operaciones de BD ocurren en **Server Actions** (`'use server'` en `reports.ts`)
+- El usuario solo envía parámetros simples (números, strings validados) a través de funciones como `getClientSegmentation()`
+- El navegador recibe **solo datos procesados**, nunca construye ni ejecuta queries SQL
+- No hay API routes expuestos que permitan queries arbitrarias
+
+### 6. Read-Only Views
+
+- Modificación accidental o maliciosa de datos transaccionales.
+
+- La app solo lee de **VIEWS**, que son capas de solo lectura sobre las tablas base
+- Incluso si hubiera una vulnerabilidad de SQL injection, el atacante no podría modificar datos porque las views no permiten INSERT/UPDATE/DELETE
+- Las tablas reales (`usuarios`, `productos`, `ordenes`) están completamente inaccesibles para `app_user`
+
+
 ## Tecnologías Utilizadas
 
 - Next.js 16 (App Router)
