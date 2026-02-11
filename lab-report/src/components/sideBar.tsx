@@ -5,7 +5,7 @@ const Sidebar = () => {
   return (
     <div className="w-60 h-screen bg-shadow-navy text-white">
       <div className="p-6">
-        <h1 className="text-xl font-bold mb-8">Lab Reports</h1>
+        <h1 className="text-xl font-bold mb-8">Reportes de la BibliotecaUP</h1>
         
         <ul className="flex flex-col gap-2">
           <li>
