@@ -165,7 +165,6 @@ Todas las consultas usan placeholders ($1, $2) en lugar de concatenar strings, p
 - Tailwind CSS (estilos)
 - TypeScript (tipado estático)
 
-
 ## Notas Adicionales
 
 - Los archivos SQL están numerados (01*, 02*, etc.) para asegurar el orden de ejecución correcto en Docker
