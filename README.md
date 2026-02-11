@@ -156,6 +156,18 @@ Si la aplicación es comprometida, el atacante solo puede leer datos de las vist
 **Queries parametrizadas:**
 Todas las consultas usan placeholders ($1, $2) en lugar de concatenar strings, previniendo SQL injection.
 
+## Trade-offs: SQL vs Next.js
+
+- **Agregaciones en SQL**: Todas las sumas, conteos y promedios se calculan en las VIEWS porque PostgreSQL es más rápido para grandes volúmenes de datos.
+
+- **Paginación en BD**: La paginación se implementa con LIMIT/OFFSET en SQL pues especifican cuántas filas mostrar (LIMIT) y cuantas deben omitir con (OFFSET).
+
+- **Filtros validados en servidor**: La validación con Zod ocurre en Server Actions antes de construir las queries. Esto evita queries inválidas y previene inyección SQL.
+
+- **Formateo de moneda en cliente**: Los valores monetarios se almacenan como DECIMAL en la BD pero el formato de presentación ($X.XX) se hace en React para aprovechar el renderizado.
+
+- **Estados de carga en cliente**: Los mensajes "Cargando..." se manejan con useState en React.
+
 ## Tecnologías Utilizadas
 
 - Next.js 16 (App Router)
