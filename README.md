@@ -16,6 +16,12 @@ git clone https://github.com/Ilyavosky/Tarea6.git
 
 Crea un archivo `.env` en la raíz del proyecto y dentro de la carpeta lab-report y añade las variables de entorno necesarias para su funcionamiento:
 
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/951eb8b9-c9f9-44e5-9acf-29a9e7deafe5" />
+
+
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/6d4048bb-62d6-43b1-bb04-78fdb5da1b8f" />
+
+
 ### 3. Entra a la consola gitbash/Powershell y levanta el Proyecto
 
 ```bash
