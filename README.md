@@ -14,7 +14,7 @@ git clone https://github.com/Ilyavosky/Tarea6.git
 
 ### 2. Configurar Variables de Entorno
 
-Crea un archivo `.env` en la raíz del proyecto y añade las variables de entorno necesarias para su funcionamiento:
+Crea un archivo `.env` en la raíz del proyecto y dentro de la carpeta lab-report y añade las variables de entorno necesarias para su funcionamiento:
 
 ### 3. Entra a la consola gitbash/Powershell y levanta el Proyecto
 
