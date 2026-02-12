@@ -10,21 +10,13 @@
 
 ```bash
 git clone https://github.com/Ilyavosky/Tarea6.git
-cd Tarea6Base
 ```
 
 ### 2. Configurar Variables de Entorno
 
-Crea un archivo `.env` en la raíz del proyecto:
+Crea un archivo `.env` en la raíz del proyecto y añade las variables de entorno necesarias para su funcionamiento:
 
-```bash
-POSTGRES_USER=lab
-POSTGRES_PASSWORD=dev_password
-POSTGRES_DB=lab_db
-POSTGRES_PORT=5437
-```
-
-### 3. Levantar el Proyecto
+### 3. Entra a la consola gitbash/Powershell y levanta el Proyecto
 
 ```bash
 docker-compose up --build
